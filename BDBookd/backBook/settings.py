@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",  # permite conectar con otros entornos de desarrollo
     "rest_framework",  # crea api
+    "rest_framework.authtoken",  # para crear el json token
     "appBook",
 ]
 

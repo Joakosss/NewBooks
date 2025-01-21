@@ -1,8 +1,11 @@
-from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from .service import get_book
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.authtoken.models import Token
 from . import serializer, models
+from django.contrib.auth.models import User
 
 
 class BookView(viewsets.ModelViewSet):
@@ -47,3 +50,36 @@ class BookView(viewsets.ModelViewSet):
 
 
 # ?searchBook=Harry+Potter+y+la+piedra+filosofal
+
+
+@api_view(["POST"])
+def login(request):
+
+    user = get_object_or_404(User, username=request.data["username"])
+    if not user.check_password(request.data["password"]):
+        return Response(
+            {"error": "usuario o contraseña invalida"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    token, created = Token.objects.get_or_create(user=user)
+    serialize = serializer.UserSerializer(instance=user)
+
+    return Response({"token": token.key, "user": serialize.data})
+
+
+@api_view(["POST"])
+def registro(request):
+    serialize = serializer.UserSerializer(data=request.data)
+    if serialize.is_valid():
+        serialize.save()
+        user = User.objects.get(username=serialize.data["username"])
+        user.set_password(serialize.data["password"])
+        user.save()
+
+        # creas un token para el usuario creado
+        token = Token.objects.create(user=user)
+        return Response(
+            {"token": token.key, "user": serialize.data}, status=status.HTTP_201_CREATED
+        )
+
+    return Response(serialize.errors, status=status.HTTP_400_BAD_REQUEST)

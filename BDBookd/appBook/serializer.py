@@ -14,3 +14,9 @@ class MyReadingSerializer(serializers.ModelSerializer):
         model = models.MyReading
         # fields=("id", "title", "description", "pages", "author", "category", "imgLink")
         fields = "__all__"
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ("username", "email", "password")
