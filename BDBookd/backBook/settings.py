@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "corsheaders",  # permite conectar con otros entornos de desarrollo
     "rest_framework",  # crea api
     "rest_framework.authtoken",  # para crear el json token
+    "coreapi",  # documenta la app
     "appBook",
 ]
 
@@ -129,3 +130,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # cors autorizaciones
 CORS_ALLOWED_ORIGINS = []
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+}
