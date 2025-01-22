@@ -7,7 +7,7 @@ function BookIndex() {
     <>
       <h1>BookIndex</h1>
       {data?.map((book) => (
-        <article>
+        <article key={book.id}>
           <img src={book.imgLink} alt="" />
         </article>
       ))}
