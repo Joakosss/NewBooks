@@ -3,8 +3,8 @@ type Book = {
     title : string,
     description : string, 
     pages : number,
-    author : string,
-    category : string,
+    authors : string[],
+    categories : string[],
     imgLink : string
 }
 
