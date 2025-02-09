@@ -24,8 +24,8 @@ class MyReading(models.Model):
         max_length=50
     )  # pendiente -leyendo -finalizado -abandonado
     currentPage = models.IntegerField()
-    calification = models.IntegerField()  # del 1 al 5
-    comments = models.TextField(max_length=500, blank=True)
+    calification = models.IntegerField(blank=True, null=True)  # del 1 al 5
+    comments = models.TextField(max_length=500, blank=True, null=True)
     startReading = models.DateField(null=True, blank=True)
     finishReading = models.DateField(null=True, blank=True)
     bookType = models.CharField(max_length=50)  # fisico - digital - audio
@@ -37,4 +37,4 @@ class MyReading(models.Model):
         )  # Evita duplicados del mismo usuario leyendo el mismo libro.
 
     def __str__(self):
-        return self.book + " " + self.user
+        return self.book.title + " " + self.user.username

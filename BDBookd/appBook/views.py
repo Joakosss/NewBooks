@@ -52,6 +52,84 @@ class BookView(viewsets.ModelViewSet):
 # ?searchBook=Harry+Potter+y+la+piedra+filosofal
 
 
+class MyReadingsView(viewsets.ModelViewSet):
+    queryset = models.MyReading.objects.all()
+    serializer_class = serializer.MyReadingSerializer
+
+
+@api_view(["POST"])
+def add_myReading(request):
+    # extraemos la informacion desde el metodo post
+    book_data = request.data["book"]
+    # validamos haber recibido correctamente los datos
+    if not book_data:
+        return Response(
+            {"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST
+        )
+    user = User.objects.get(email=request.data["user"])
+    if not user:
+        return Response(
+            {"error": "Reintenta hacer login"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+    # creamos o revisamos si existe en nuestra base de datos el libro
+    book, created = models.Books.objects.get_or_create(
+        id=book_data["id"],
+        defaults={
+            "title": book_data["title"],
+            "description": book_data["description"],
+            "author": book_data["author"],
+            "category": book_data["category"],
+            "imgLink": book_data["imgLink"],
+            "pages": book_data["pages"],
+        },
+    )
+
+    myReading = models.MyReading.objects.create(
+        book=book,
+        user=user,
+        state=request.data["myReading"]["state"],
+        currentPage=request.data["myReading"]["currentPage"],
+        calification=request.data["myReading"]["calification"],
+        comments=request.data["myReading"]["comments"],
+        startReading=request.data["myReading"]["startReading"],
+        finishReading=request.data["myReading"]["finishReading"],
+        bookType=request.data["myReading"]["bookType"],
+    )
+
+    """ print(book_data["title"]) """
+    # devolver una respuesta adecuada
+    return Response({"message": "Book added successfully"})
+
+
+"""  book_data = request.data.get("book")
+    my_reading_data = request.data.get("myReading")
+
+    if not book_data or not my_reading_data:
+        return Response(
+            {"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST
+        )
+    book, created = models.Books.objects.get_or_create(
+        id=book_data["id"],
+        defaults={
+            "title": book_data["title"],
+            "description": book_data["description"],
+            "pages": book_data["pages"],
+            "author": book_data["author"],
+            "category": book_data["category"],
+            "imgLink": book_data["imgLink"],
+        },
+    )
+    my_reading_data["book"] = book.id
+    my_reading_serializer = serializer.MyReadingSerializer(data=my_reading_data)
+    if my_reading_serializer.is_valid():
+        my_reading_serializer.save()
+        return Response(my_reading_serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(
+            my_reading_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        ) """
+
+
 @api_view(["POST"])
 def login(request):
 
