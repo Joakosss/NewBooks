@@ -11,8 +11,8 @@ const queryFrontBooks = (query:string):Promise<Book[]>=>{
             title : item.volumeInfo.title,
             description : item.volumeInfo.description, 
             pages : item.volumeInfo.pageCount,
-            authors : item.volumeInfo.authors,
-            categories : item.volumeInfo.categories,
+            author : item.volumeInfo.authors[0],
+            category : item.volumeInfo.categories[0],
             imgLink : item.volumeInfo.imageLinks.thumbnail
         }))})
 }
