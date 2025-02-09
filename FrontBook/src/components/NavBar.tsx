@@ -14,6 +14,7 @@ function Navbar() {
           <Link to={"/login"}>Login</Link>
           <Link to={"/registro"}>Registro</Link>
           <Link to={"/searchBook"}>Buscar</Link>
+          <Link to={"/myBooks"}>Mis Libros</Link>
         </Flex>
       </Flex>
     </>

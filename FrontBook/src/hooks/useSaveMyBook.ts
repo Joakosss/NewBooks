@@ -8,6 +8,9 @@ export function useSaveMyBook(){
     mutationFn:(book:Book)=>
       axios.post<Book>("http://127.0.0.1:8000/add-my-reading/",book)
       .then((response)=>response.data)
+      .catch((error)=>{
+        throw error();
+      })
   })
 }
 

@@ -1,9 +1,8 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Book from "../types/Book";
 import { Button, Flex, Input, Select, Text } from "@chakra-ui/react";
 import { useSaveMyBook } from "../hooks/useSaveMyBook";
 import { useRef } from "react";
-import { MyReading } from "../types/myReading";
 
 function AddBook() {
   const location = useLocation();
@@ -12,6 +11,12 @@ function AddBook() {
   const myPagesRef = useRef<HTMLInputElement>(null);
   const stateRef = useRef<HTMLSelectElement>(null);
   const bookTypeRef = useRef<HTMLSelectElement>(null);
+
+  /* navegaciones */
+  const navigate = useNavigate();
+  const handleNavigate = (url: string) => {
+    navigate(url);
+  };
 
   const { mutate, isPending, error } = useSaveMyBook();
   const handleSend = (e) => {
@@ -32,8 +37,20 @@ function AddBook() {
         (bookTypeRef.current?.value as "fisico" | "digital" | "audio") ||
         "fisico",
     };
-
-    mutate({ myReading, book: book, user: "juako@juako.com" });
+    /* hay que modificar el user por el usuario activo cuando haya login */
+    mutate(
+      { myReading, book: book, user: "juako@juako.com" },
+      {
+        onError: () => {
+          alert("Libro ya registrado o error en el proceso");
+          handleNavigate("/searchBook");
+        },
+        onSuccess: () => {
+          alert("libro registrado con éxito");
+          handleNavigate("/");
+        },
+      }
+    );
   };
   return (
     <form onSubmit={handleSend} method="Post">

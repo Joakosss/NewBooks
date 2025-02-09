@@ -5,6 +5,7 @@ import Register from "./Register";
 import Layout from "../components/Layout";
 import SearchBook from "./SearchBook";
 import AddBook from "./AddBook";
+import GetMyBooks from "./GetMyBooks";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
       { path: "/registro", element: <Register /> },
       { path: "/searchBook", element: <SearchBook /> },
       { path: "/addBook", element: <AddBook /> },
+      { path: "/myBooks", element: <GetMyBooks /> },
     ],
   },
 ]);

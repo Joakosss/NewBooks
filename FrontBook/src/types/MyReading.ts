@@ -1,7 +1,7 @@
 import Book from "./Book";
 export type MyReading = {
+    id: string,
     book:Book,
-    user: string,
     state: "pendiente"|"leyendo"|"finalizado"|"abandonado" ,
     currentPage: number,
     calification: 1|2|3|4|5|null,
@@ -10,3 +10,4 @@ export type MyReading = {
     finishReading: Date|null,
     bookType: "fisico" | "digital" | "audio" ,
 }; 
+
