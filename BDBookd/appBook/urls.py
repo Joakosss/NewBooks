@@ -13,7 +13,8 @@ urlpatterns = [
     path("login/", views.login),
     path("register/", views.registro),
     path("docs/", include_docs_urls(title="Book API")),
-    path("add-my-reading/", views.add_myReading),
+    path("add-my-reading/", views.addMyReading),
+    path("read-my-readings/", views.getMyReadings),
 ]
 
 # """ path("book/<str:searchBook>", views.ApiConsult), """

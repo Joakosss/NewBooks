@@ -4,15 +4,27 @@ from . import models
 
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Books
+        model = models.Book
         # fields=("id", "title", "description", "pages", "author", "category", "imgLink")
         fields = "__all__"
 
 
 class MyReadingSerializer(serializers.ModelSerializer):
+    book = BookSerializer()
+
     class Meta:
         model = models.MyReading
-        fields = "__all__"
+        fields = (
+            "id",
+            "state",
+            "currentPage",
+            "calification",
+            "comments",
+            "startReading",
+            "finishReading",
+            "bookType",
+            "book",
+        )
 
 
 class UserSerializer(serializers.ModelSerializer):
