@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Books(models.Model):
+class Book(models.Model):
     id = models.CharField(max_length=50, primary_key=True)
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=2000)
@@ -16,7 +16,7 @@ class Books(models.Model):
 
 
 class MyReading(models.Model):
-    book = models.ForeignKey(Books, on_delete=models.CASCADE, related_name="lecturas")
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="lecturas")
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="libros_leidos"
     )

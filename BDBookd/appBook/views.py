@@ -134,7 +134,7 @@ def getMyReadings(request):
 @api_view(["POST"])
 def login(request):
 
-    user = get_object_or_404(User, username=request.data["username"])
+    user = get_object_or_404(User, email=request.data["email"])
     if not user.check_password(request.data["password"]):
         return Response(
             {"error": "usuario o contraseña invalida"},
