@@ -1,11 +1,14 @@
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from .service import get_book
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from . import serializer, models
 from django.contrib.auth.models import User
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class BookView(viewsets.ModelViewSet):
@@ -59,16 +62,18 @@ class MyReadingsView(viewsets.ModelViewSet):
 
 # Crear un libro en mi colección
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def addMyReading(request):
     # extraemos la informacion desde el metodo post
     book_data = request.data["book"]
     # validamos haber recibido correctamente los datos
     if not book_data:
+        print("erro1")
         return Response(
             {"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST
         )
-    user = User.objects.get(email=request.data["user"])
-    if not user:
+    if not request.user:
+        print("erro2")
         return Response(
             {"error": "Reintenta hacer login"}, status=status.HTTP_401_UNAUTHORIZED
         )
@@ -84,48 +89,39 @@ def addMyReading(request):
             "pages": book_data["pages"],
         },
     )
-
-    myReading = models.MyReading.objects.create(
-        book=book,
-        user=user,
-        state=request.data["myReading"]["state"],
-        currentPage=request.data["myReading"]["currentPage"],
-        calification=request.data["myReading"]["calification"],
-        comments=request.data["myReading"]["comments"],
-        startReading=request.data["myReading"]["startReading"],
-        finishReading=request.data["myReading"]["finishReading"],
-        bookType=request.data["myReading"]["bookType"],
-    )
-
+    try:
+        myReading = models.MyReading.objects.create(
+            book=book,
+            user=request.user,
+            state=request.data["myReading"]["state"],
+            currentPage=request.data["myReading"]["currentPage"],
+            calification=request.data["myReading"]["calification"],
+            comments=request.data["myReading"]["comments"],
+            startReading=request.data["myReading"]["startReading"],
+            finishReading=request.data["myReading"]["finishReading"],
+            bookType=request.data["myReading"]["bookType"],
+        )
+    except IntegrityError:
+        return Response(
+            {"message": "Libro ya en mis libros"}, status=status.HTTP_409_CONFLICT
+        )
     """ print(book_data["title"]) """
     # devolver una respuesta adecuada
     return Response(
-        {"message": "Book added successfully"}, status=status.HTTP_201_CREATED
+        {"message": "Mi libro fue añadido correctamente"},
+        status=status.HTTP_201_CREATED,
     )
 
 
 # Metodo get para traer mis libros de mi colección
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def getMyReadings(request):
-    email = request.query_params.get("email")
-    """ Validamos la existencia del email en el parametro """
-    if not email:
+    if not request.user:
         return Response(
             {"error": "Parametros no validos"}, status=status.HTTP_400_BAD_REQUEST
         )
-    # creamos el usuario a partir del email, si no entrega un error 404
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        return Response(
-            {"error": "Usuario no existe"}, status=status.HTTP_404_NOT_FOUND
-        )
-    except Exception as e:
-        return Response(
-            {"error": "Error desconocido"}, status=status.HTTP_404_NOT_FOUND
-        )
-
-    books = models.MyReading.objects.filter(user=user).select_related("book")
+    books = models.MyReading.objects.filter(user=request.user).select_related("book")
     # SERIALIZAMOS(JSON) EL QUERY SET BOOK
     serializerr = serializer.MyReadingSerializer(books, many=True)
     return Response(serializerr.data, status=status.HTTP_200_OK)
@@ -143,7 +139,7 @@ def login(request):
     token, created = Token.objects.get_or_create(user=user)
     serialize = serializer.UserSerializer(instance=user)
 
-    return Response({"token": token.key, "user": serialize.data})
+    return Response({"token": token.key, "user": serialize.data["email"]})
 
 
 @api_view(["POST"])

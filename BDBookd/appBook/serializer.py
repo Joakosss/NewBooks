@@ -10,10 +10,21 @@ class BookSerializer(serializers.ModelSerializer):
 
 
 class MyReadingSerializer(serializers.ModelSerializer):
+    book = BookSerializer()
+
     class Meta:
         model = models.MyReading
-        # fields=("id", "title", "description", "pages", "author", "category", "imgLink")
-        fields = "__all__"
+        fields = (
+            "id",
+            "state",
+            "currentPage",
+            "calification",
+            "comments",
+            "startReading",
+            "finishReading",
+            "bookType",
+            "book",
+        )
 
 
 class UserSerializer(serializers.ModelSerializer):

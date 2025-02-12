@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",  # permite conectar con otros entornos de desarrollo
     "rest_framework",  # crea api
+    "rest_framework_simplejwt",  # para crear el json token otra opcion
     "rest_framework.authtoken",  # para crear el json token
     "coreapi",  # documenta la app
     "appBook",
@@ -132,5 +134,19 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+}
+
+
+# configuracion jwt duracion
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        minutes=60
+    ),  # Duración del access token (60 minutos)
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Duración del refresh token (7 días)
+    "ROTATE_REFRESH_TOKENS": False,  # Si se genera un nuevo refresh token al actualizar
+    "BLACKLIST_AFTER_ROTATION": False,  # Si se añaden los tokens antiguos a una lista negra
 }

@@ -1,23 +1,36 @@
 import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import React, { forwardRef, useRef, HTMLInputTypeAttribute } from "react";
 import { Link } from "react-router-dom";
+import { useLogin } from "../hooks/useLogin";
 
 function Login() {
   const correoRef = useRef<HTMLInputElement>(null);
   const passRef = useRef<HTMLInputElement>(null);
 
+  const { mutate, isPending, error } = useLogin();
   const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!correoRef.current?.value || !passRef.current?.value) return;
+    mutate(
+      { email: correoRef.current?.value, pass: passRef.current?.value },
+      {
+        onError: () => {
+          alert("login erroneo");
+          /* handleNavigate("/searchBook"); */
+        },
+        onSuccess: (data) => {
+          alert("login exitoso");
 
-    console.log(correoRef.current?.value);
-    console.log(passRef.current?.value);
+          /* handleNavigate("/"); */
+        },
+      }
+    );
   };
 
   return (
     <>
       <form onSubmit={handleSend}>
-        <label>Correo o contraseña invalidos</label>
+        {error && <label>Correo o contraseña invalidos</label>}
         <MyInput
           Label="Correo"
           placeholder="Ingrese correo electronico"

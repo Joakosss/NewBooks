@@ -39,7 +39,7 @@ function AddBook() {
     };
     /* hay que modificar el user por el usuario activo cuando haya login */
     mutate(
-      { myReading, book: book, user: "juako@juako.com" },
+      { myReading, book: book },
       {
         onError: () => {
           alert("Libro ya registrado o error en el proceso");
