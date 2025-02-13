@@ -1,4 +1,11 @@
-import { Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import {
+  Button,
+  Center,
+  Flex,
+  FormControl,
+  FormLabel,
+  Input,
+} from "@chakra-ui/react";
 import React, { forwardRef, useRef, HTMLInputTypeAttribute } from "react";
 import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
@@ -7,7 +14,9 @@ function Login() {
   const correoRef = useRef<HTMLInputElement>(null);
   const passRef = useRef<HTMLInputElement>(null);
 
-  const { mutate, isPending, error } = useLogin();
+  const { mutate, error } = useLogin();
+  /* useAuthStore.getState.setAuth(response.data) */
+
   const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!correoRef.current?.value || !passRef.current?.value) return;
@@ -19,6 +28,7 @@ function Login() {
           /* handleNavigate("/searchBook"); */
         },
         onSuccess: (data) => {
+          /* useAuthStore.setAuth(data); */
           alert("login exitoso");
 
           /* handleNavigate("/"); */
@@ -28,29 +38,29 @@ function Login() {
   };
 
   return (
-    <>
-      <form onSubmit={handleSend}>
+    <Center h={"100vh"}>
+      <form onSubmit={handleSend} style={styles.form}>
         {error && <label>Correo o contraseña invalidos</label>}
         <MyInput
-          Label="Correo"
-          placeholder="Ingrese correo electronico"
+          Label="Usuario"
+          placeholder="Ingrese usuario"
           type="text"
           ref={correoRef}
         />
         <MyInput
           Label="Contraseña"
-          placeholder="Ingrese contraseña"
+          placeholder="Ingrese nombre de usuario"
           type="password"
           ref={passRef}
         />
-        <div>
+        <Flex gap={"1rem"} mt={"1rem"} justifyContent={"center"}>
           <Button>
             <Link to={"/registro"}>Registrarse</Link>
           </Button>
           <Button type="submit">Conectarse</Button>
-        </div>
+        </Flex>
       </form>
-    </>
+    </Center>
   );
 }
 
@@ -65,10 +75,26 @@ type MyInputProps = {
 const MyInput = forwardRef<HTMLInputElement, MyInputProps>(
   ({ Label, placeholder, type }, ref) => {
     return (
-      <FormControl>
+      <FormControl w={"25rem"}>
         <FormLabel htmlFor={Label}>{Label}</FormLabel>
-        <Input id={Label} type={type} placeholder={placeholder} ref={ref} />
+        <Input
+          id={Label}
+          type={type}
+          placeholder={placeholder}
+          ref={ref}
+          bg={"white"}
+        />
       </FormControl>
     );
   }
 );
+
+const styles = {
+  form: {
+    background: "#FAF089",
+    padding: "3rem",
+    borderRadius: "1rem",
+    boxShadow:
+      "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+  },
+};

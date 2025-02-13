@@ -10,12 +10,12 @@ from rest_framework_simplejwt.views import (
 
 
 router = DefaultRouter()
-router.register(r"books", views.BookView)
 
 urlpatterns = [
     path("api/v1/", include(router.urls)),
     # path("login/", views.login),
     path("register/", views.registro),
+    path("topBooks/", views.mostPopularBooks),
     path("docs/", include_docs_urls(title="Book API")),
     path("add-my-reading/", views.addMyReading),
     path("read-my-readings/", views.getMyReadings),

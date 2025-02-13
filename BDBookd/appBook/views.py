@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from . import serializer, models
 from django.contrib.auth.models import User
-from rest_framework_simplejwt.views import TokenObtainPairView
+from django.db.models import Count
 
 
 class BookView(viewsets.ModelViewSet):
@@ -144,17 +144,34 @@ def login(request):
 
 @api_view(["POST"])
 def registro(request):
-    serialize = serializer.UserSerializer(data=request.data)
-    if serialize.is_valid():
-        serialize.save()
-        user = User.objects.get(username=serialize.data["username"])
-        user.set_password(serialize.data["password"])
-        user.save()
-
-        # creas un token para el usuario creado
-        token = Token.objects.create(user=user)
-        return Response(
-            {"token": token.key, "user": serialize.data}, status=status.HTTP_201_CREATED
+    try:
+        User.objects.create_user(
+            username=request.data["username"],
+            password=request.data["password"],
+            email=request.data["email"],
         )
+    except KeyError:
+        return Response(
+            {"error": "Datos incompletos"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except IntegrityError:
+        return Response(
+            {"error": "Nombre de usuario ya existente"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"message": "Creado con éxito"}, status=status.HTTP_201_CREATED)
 
-    return Response(serialize.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+def mostPopularBooks(request):
+    maxResults = request.query_params.get(
+        "maxResults", 4
+    )  # cantidad maxima de elementos del top que quiero retornar
+    top_books = models.Book.objects.annotate(reading_count=Count("lecturas")).order_by(
+        "-reading_count"
+    )[: int(maxResults)]
+    serialize = serializer.BookSerializer(instance=top_books, many=True)
+    return Response({"top_books": serialize.data}, status=status.HTTP_200_OK)
