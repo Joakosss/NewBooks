@@ -33,9 +33,7 @@ function SearchBook() {
   useEffect(() => {
     if (searchTerms.trim() !== "") {
       mutate(searchTerms, {
-        onError: (error) => {
-          console.log(error.message);
-        },
+        onError: (error) => {},
       });
     }
   }, [searchTerms, mutate]);

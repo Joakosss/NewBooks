@@ -14,8 +14,7 @@ const queryLogin=(email:string,pass:string)=>{
         return response.data
     })
     .catch((error)=>{
-        console.log(error.message)
-        throw new error()})
+        throw new error(error)})
 }
 
 export function useLogin(){

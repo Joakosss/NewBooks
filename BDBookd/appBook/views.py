@@ -148,7 +148,7 @@ def registro(request):
         User.objects.create_user(
             username=request.data["username"],
             password=request.data["password"],
-            email=request.data["email"],
+            # email=request.data["email"],
         )
     except KeyError:
         return Response(

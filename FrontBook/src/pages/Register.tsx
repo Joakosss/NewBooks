@@ -6,26 +6,36 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/react";
+import { useMutation } from "@tanstack/react-query";
 import { SubmitHandler, useForm } from "react-hook-form";
-
+import { fetchRegister } from "../api/FnFetchRegister";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 type FormType = {
   username: string;
   password: string;
   rePassword: string;
 };
 
-function Register({}: Props) {
+function Register() {
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm<FormType>();
-
   const password = watch("password");
+  const navigate = useNavigate();
+  const { mutate, error } = useMutation({
+    mutationFn: (data: FormType) => fetchRegister(data.username, data.password),
+    onSuccess: () => {
+      alert("registro con éxito");
+      navigate("/login");
+    },
+  });
 
   const onSubmit: SubmitHandler<FormType> = (data) => {
-    console.log(data);
+    mutate(data);
   };
   return (
     <Center h={"100vh"}>
@@ -33,11 +43,13 @@ function Register({}: Props) {
         <FormControl w={"25rem"}>
           <FormLabel htmlFor={"user"}>Nombre de usuario</FormLabel>
           <Input
+            placeholder="Ingrese nombre de usuario"
             bg={"white"}
             {...register("username", {
               required: "El nombre de usuario es requerido",
             })}
           ></Input>
+          {error && <small>{error.message}</small>}
           {errors.username && <small>{errors.username.message}</small>}
         </FormControl>
         <FormControl w={"25rem"}>

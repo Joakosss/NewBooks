@@ -17,7 +17,6 @@ export function useSaveMyBook(){
         return response.data})
       .catch((error)=>{
         if (error.response && error.response.status === 401) {
-          console.log("revalidando token")
           return refreshToken().then(
               (newAccessToken)=>{
                   header = {"Authorization":`Bearer ${newAccessToken}` }
