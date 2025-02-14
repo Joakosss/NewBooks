@@ -1,15 +1,15 @@
 import axios from "axios";
+import useAuthToken from "../store/storeAuthZustand";
 
 
 
 export async function refreshToken(){
-    const stringToken = window.localStorage.getItem("tokens")
-    const tokens = stringToken? JSON.parse(stringToken):null
-    const response = await axios.post("http://127.0.0.1:8000/token/refresh/",{refresh:tokens.refresh})
+    const refresh = useAuthToken.getState().tokens?.refresh || ''
+    const response = await axios.post("http://127.0.0.1:8000/token/refresh/",{refresh:refresh})
     const newTokens = {
         access: response.data.access,
-        refresh: tokens.refresh,
+        refresh: refresh,
     }
-    window.localStorage.setItem("tokens", JSON.stringify(newTokens))
+    useAuthToken.getState().setAuth(newTokens)
     return newTokens.access;
 }

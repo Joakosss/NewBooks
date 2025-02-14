@@ -17,7 +17,6 @@ type GoogleBookItem = {
 
 
 function TransformResponceToBookType(res: any): Book[] {
-    console.log(res)
     return res.items.map((book: GoogleBookItem) => ({
       id: book.id,
       title: book.volumeInfo.title || "Sin titulo",

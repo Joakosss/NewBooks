@@ -24,7 +24,10 @@ function Register() {
     watch,
     formState: { errors },
   } = useForm<FormType>();
-  const password = watch("password");
+
+  //Validacion de contraseñas
+  const [password] = watch(["password"]);
+
   const navigate = useNavigate();
   const { mutate, error } = useMutation({
     mutationFn: (data: FormType) => fetchRegister(data.username, data.password),
