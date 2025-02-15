@@ -9,6 +9,7 @@ type BookCardProps = {
 function BookCard({ book, handleNavigate }: BookCardProps) {
   return (
     <Card
+      maxW={"200px"}
       _hover={{ transform: "scale(1.03)", transition: "transform 0.3s" }}
       w={"100"}
       onClick={() => handleNavigate(book)}

@@ -7,7 +7,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import React, { forwardRef, useRef, HTMLInputTypeAttribute } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
 
 function Login() {
@@ -15,8 +15,7 @@ function Login() {
   const passRef = useRef<HTMLInputElement>(null);
 
   const { mutate, error } = useLogin();
-  /* useAuthStore.getState.setAuth(response.data) */
-
+  const navigate = useNavigate();
   const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!correoRef.current?.value || !passRef.current?.value) return;
@@ -27,11 +26,8 @@ function Login() {
           alert("login erroneo");
           /* handleNavigate("/searchBook"); */
         },
-        onSuccess: (data) => {
-          /* useAuthStore.setAuth(data); */
-          alert("login exitoso");
-
-          /* handleNavigate("/"); */
+        onSuccess: () => {
+          navigate("/");
         },
       }
     );

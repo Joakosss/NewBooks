@@ -1,22 +1,33 @@
-import { useMyBooks } from "../hooks/useMyBooks";
 import { MyReading } from "../types/MyReading";
+import { getRequest } from "../api/apis";
+import { useQuery } from "@tanstack/react-query";
+import BookCard from "../components/BookCard";
+import { SimpleGrid } from "@chakra-ui/react";
 
 export default function GetMyBooks() {
   /* Aqui hay que cambiar el usuario y ponerlo como parametro abajo */
-  const { data: misLibros, error, isLoading } = useMyBooks();
+  const {
+    data: myReadings,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["misLecturas"],
+    queryFn: () => getRequest("http://127.0.0.1:8000/my-readings"),
+  });
 
-  if (!Array.isArray(misLibros)) {
-    return <div>Error</div>;
-  }
+  const handleClick = (myReading: MyReading) => {
+    alert(myReading.book?.title);
+  };
 
   return (
-    <>
-      {misLibros?.map((libro: MyReading) => (
-        <div key={libro.id}>
-          <img src={libro.book.imgLink} alt="" />
-          <div>{libro.book.title}</div>
-        </div>
+    <SimpleGrid minChildWidth="150px" gap={10}>
+      {myReadings?.map((book: MyReading) => (
+        <BookCard
+          key={book.id}
+          book={book.book}
+          handleNavigate={() => handleClick(book)}
+        />
       ))}
-    </>
+    </SimpleGrid>
   );
 }

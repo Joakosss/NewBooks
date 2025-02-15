@@ -17,8 +17,7 @@ urlpatterns = [
     path("register/", views.registro),
     path("topBooks/", views.mostPopularBooks),
     path("docs/", include_docs_urls(title="Book API")),
-    path("add-my-reading/", views.addMyReading),
-    path("read-my-readings/", views.getMyReadings),
+    path("my-readings/", views.myReadings),
     #
     # simple jwt
     path("login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),

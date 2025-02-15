@@ -10,6 +10,8 @@ from . import serializer, models
 from django.contrib.auth.models import User
 from django.db.models import Count
 
+from rest_framework.views import APIView
+
 
 class BookView(viewsets.ModelViewSet):
     queryset = models.Book.objects.all()
@@ -55,76 +57,113 @@ class BookView(viewsets.ModelViewSet):
 # ?searchBook=Harry+Potter+y+la+piedra+filosofal
 
 
-class MyReadingsView(viewsets.ModelViewSet):
-    queryset = models.MyReading.objects.all()
-    serializer_class = serializer.MyReadingSerializer
-
-
-# Crear un libro en mi colección
-@api_view(["POST"])
+# CRUD MyReadings
+@api_view(["GET", "POST", "PATCH", "DELETE"])
 @permission_classes([IsAuthenticated])
-def addMyReading(request):
-    # extraemos la informacion desde el metodo post
-    book_data = request.data["book"]
-    # validamos haber recibido correctamente los datos
-    if not book_data:
-        print("erro1")
-        return Response(
-            {"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST
+def myReadings(request):
+    if request.method == "GET":  # Espera token access
+        books = models.MyReading.objects.filter(user=request.user).select_related(
+            "book"
         )
-    if not request.user:
-        print("erro2")
-        return Response(
-            {"error": "Reintenta hacer login"}, status=status.HTTP_401_UNAUTHORIZED
-        )
-    # creamos o revisamos si existe en nuestra base de datos el libro
-    book, created = models.Book.objects.get_or_create(
-        id=book_data["id"],
-        defaults={
-            "title": book_data["title"],
-            "description": book_data["description"],
-            "author": book_data["author"],
-            "category": book_data["category"],
-            "imgLink": book_data["imgLink"],
-            "pages": book_data["pages"],
-        },
-    )
-    try:
-        myReading = models.MyReading.objects.create(
-            book=book,
-            user=request.user,
-            state=request.data["myReading"]["state"],
-            currentPage=request.data["myReading"]["currentPage"],
-            calification=request.data["myReading"]["calification"],
-            comments=request.data["myReading"]["comments"],
-            startReading=request.data["myReading"]["startReading"],
-            finishReading=request.data["myReading"]["finishReading"],
-            bookType=request.data["myReading"]["bookType"],
-        )
-    except IntegrityError:
-        return Response(
-            {"message": "Libro ya en mis libros"}, status=status.HTTP_409_CONFLICT
-        )
-    """ print(book_data["title"]) """
-    # devolver una respuesta adecuada
-    return Response(
-        {"message": "Mi libro fue añadido correctamente"},
-        status=status.HTTP_201_CREATED,
-    )
+        # SERIALIZAMOS(JSON) EL QUERY SET BOOK
+        serializerr = serializer.MyReadingSerializer(books, many=True)
+        return Response(serializerr.data, status=status.HTTP_200_OK)
+    elif request.method == "POST":  # Espera token access, {book, myReading}
+        if "book" not in request.data or "myReading" not in request.data:
+            return Response(
+                {"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-
-# Metodo get para traer mis libros de mi colección
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def getMyReadings(request):
-    if not request.user:
-        return Response(
-            {"error": "Parametros no validos"}, status=status.HTTP_400_BAD_REQUEST
+        # extraemos la informacion desde el metodo post
+        book_data = request.data["book"]
+        # validamos haber recibido correctamente los datos
+        # creamos o revisamos si existe en nuestra base de datos el libro
+        book, created = models.Book.objects.get_or_create(
+            id=book_data["id"],
+            defaults={
+                "title": book_data["title"],
+                "description": book_data["description"],
+                "author": book_data["author"],
+                "category": book_data["category"],
+                "imgLink": book_data["imgLink"],
+                "pages": book_data["pages"],
+            },
         )
-    books = models.MyReading.objects.filter(user=request.user).select_related("book")
-    # SERIALIZAMOS(JSON) EL QUERY SET BOOK
-    serializerr = serializer.MyReadingSerializer(books, many=True)
-    return Response(serializerr.data, status=status.HTTP_200_OK)
+        try:
+            myReading = models.MyReading.objects.create(
+                book=book,
+                user=request.user,
+                state=request.data["myReading"]["state"],
+                currentPage=request.data["myReading"]["currentPage"],
+                calification=request.data["myReading"]["calification"],
+                comments=request.data["myReading"]["comments"],
+                startReading=request.data["myReading"]["startReading"],
+                finishReading=request.data["myReading"]["finishReading"],
+                bookType=request.data["myReading"]["bookType"],
+            )
+            return Response(
+                {"message": "Mi libro fue añadido correctamente"},
+                status=status.HTTP_201_CREATED,
+            )
+        except IntegrityError:
+            return Response(
+                {"message": "Libro ya en mis libros"}, status=status.HTTP_409_CONFLICT
+            )
+        except:
+            return Response(
+                {"message": "Error inesperado"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        # devolver una respuesta adecuada
+    elif (
+        request.method == "PATCH"
+    ):  # Espera token acces y {myReadingId, myReading:{myReadingData}}
+        try:
+            my_reading = models.MyReading.objects.get(
+                id=request.data["myReadingId"], user=request.user
+            )
+        except:
+            return Response(
+                {"error": "Error inesperado"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializerr = serializer.MyReadingSerializer(
+            my_reading,
+            data=request.data[
+                "myReading"
+            ],  # tomo todos los datos entregados por el request
+            partial=True,  # le digo que puede ser solo una parte del serializer
+        )
+        if serializerr.is_valid():
+            serializerr.save()
+            print(serializerr)
+        else:
+            return Response(
+                {"error": "Error inesperado"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response({"message": my_reading.id}, status=status.HTTP_200_OK)
+    elif request.method == "DELETE":  # Espera el token acces y {myReadingId}
+
+        if "myReadingId" not in request.data:
+            return Response(
+                {"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            my_reading = models.MyReading.objects.get(
+                id=request.data["myReadingId"], user=request.user
+            )
+            my_reading.delete()
+            return Response({"message": "Delete Correcto"}, status=status.HTTP_200_OK)
+        except AttributeError:
+            return Response(
+                {"message": "No corresponde a una lectura propia"},
+                status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION,
+            )
+        except Exception as e:
+            return Response(
+                {"message": "Error inesperado"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 @api_view(["POST"])

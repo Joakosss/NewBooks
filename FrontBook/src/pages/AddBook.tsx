@@ -3,6 +3,7 @@ import Book from "../types/Book";
 import { Button, Flex, Input, Select, Text } from "@chakra-ui/react";
 import { useSaveMyBook } from "../hooks/useSaveMyBook";
 import { useRef } from "react";
+import { MyReading } from "../types/MyReading";
 
 function AddBook() {
   const location = useLocation();
@@ -18,10 +19,10 @@ function AddBook() {
     navigate(url);
   };
 
-  const { mutate, isPending, error } = useSaveMyBook();
+  const { mutate } = useSaveMyBook();
   const handleSend = (e) => {
     e.preventDefault();
-    const myReading = {
+    const myReading: MyReading = {
       state:
         (stateRef.current?.value as
           | "pendiente"
@@ -37,9 +38,9 @@ function AddBook() {
         (bookTypeRef.current?.value as "fisico" | "digital" | "audio") ||
         "fisico",
     };
-    /* hay que modificar el user por el usuario activo cuando haya login */
+
     mutate(
-      { myReading, book: book },
+      { myReading, book },
       {
         onError: () => {
           alert("Libro ya registrado o error en el proceso");
