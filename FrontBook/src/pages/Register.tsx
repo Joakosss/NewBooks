@@ -9,8 +9,8 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { fetchRegister } from "../api/FnFetchRegister";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { colors } from "../colors";
 type FormType = {
   username: string;
   password: string;
@@ -93,7 +93,7 @@ export default Register;
 
 const styles = {
   form: {
-    background: "#FAF089",
+    background: colors.brand.primary,
     padding: "3rem",
     borderRadius: "1rem",
     boxShadow:

@@ -1,9 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Book from "../types/Book";
-import { Button, Flex, Input, Select, Text } from "@chakra-ui/react";
-import { useSaveMyBook } from "../hooks/useSaveMyBook";
+import { Button, Flex, Input, Select, Spinner, Text } from "@chakra-ui/react";
 import { useRef } from "react";
 import { MyReading } from "../types/MyReading";
+import { useMutation } from "@tanstack/react-query";
+import { postRequest } from "../api/apis";
 
 function AddBook() {
   const location = useLocation();
@@ -19,7 +20,12 @@ function AddBook() {
     navigate(url);
   };
 
-  const { mutate } = useSaveMyBook();
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: (data: { myReading: MyReading; book: Book }) =>
+      postRequest("http://127.0.0.1:8000/my-readings/", data),
+  });
+
+  /* const { mutate } = useSaveMyBook(); */
   const handleSend = (e) => {
     e.preventDefault();
     const myReading: MyReading = {
@@ -96,9 +102,16 @@ function AddBook() {
         </Select>
       </div>
       <Flex gap={"3"}>
-        <Button type="button">Atras</Button>
+        <Button type="button" onClick={() => navigate(-1)}>
+          Atras
+        </Button>
         <Button type="submit">Guardar</Button>
       </Flex>
+      <Spinner
+        display={isPending ? "block" : "none"}
+        position={"absolute"}
+        size="xl"
+      />
     </form>
   );
 }

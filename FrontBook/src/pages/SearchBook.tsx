@@ -8,8 +8,9 @@ import {
   SimpleGrid,
   Grid,
   GridItem,
+  Card,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Book from "../types/Book";
 import { GiArchiveResearch } from "react-icons/gi";
 import BookCard from "../components/BookCard";
@@ -17,13 +18,16 @@ import BookCard from "../components/BookCard";
 function SearchBook() {
   const [searchBook, setSearchBook] = useState("");
   const [searchTerms, setSearchTerms] = useState("");
-  const { mutate, data } = useSearchBook();
+  const { mutate, data, isPending, reset } = useSearchBook();
 
   /* UseEfect para pasar del input al terms la busqueda */
   useEffect(() => {
     const waitingTerms = setTimeout(() => {
       if (searchBook.trim() !== "") {
         setSearchTerms(searchBook);
+      } else {
+        /* al estar el imput vacio elimina los datos buscados */
+        reset();
       }
     }, 500);
     return () => clearTimeout(waitingTerms);
@@ -52,6 +56,15 @@ function SearchBook() {
     }
   };
 
+  const location = useLocation();
+  const { busqueda = "" } = location.state || {};
+
+  useEffect(() => {
+    if (busqueda) {
+      setSearchBook(busqueda);
+    }
+  }, [busqueda]);
+
   return (
     <Grid
       templateColumns="repeat(10,1fr)"
@@ -70,7 +83,7 @@ function SearchBook() {
           <Button
             type="submit"
             w={"100px"}
-            bg={"yellow.200"}
+            bg={"#FEB2B2"}
             _hover={{ bg: "yellow.100" }}
             boxShadow={"lg"}
           >
@@ -79,14 +92,19 @@ function SearchBook() {
         </form>
       </GridItem>
       <GridItem rowSpan={2} colSpan={10}>
-        {!data || searchBook === "" ? (
+        {/* sin libros ni busqueda */}
+        {!data && searchBook === "" && (
           <Center flexDirection={"column"}>
             <GiArchiveResearch size={"200px"} />
             <Text mt={"-30px"} fontSize={"5xl"}>
               Buscamos libros
             </Text>
           </Center>
-        ) : (
+        )}
+        {/* Cargando datos */}
+        {isPending || (searchBook !== "" && <div>Cargando</div>)}
+        {/* Ya hay datos */}
+        {data && searchBook !== "" && (
           <SimpleGrid minChildWidth="150px" gap={10} width="100%">
             {data.map((book: Book) => (
               <BookCard
@@ -110,3 +128,7 @@ const styles = {
     gap: "20px",
   },
 };
+
+function SkeletonCard() {
+  return <Card>Hola</Card>;
+}

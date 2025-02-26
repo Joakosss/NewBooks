@@ -1,4 +1,4 @@
-import { Grid, GridItem } from "@chakra-ui/react";
+import { Flex, Grid, GridItem } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { LuBookCopy } from "react-icons/lu";
 import useAuthToken from "../store/storeAuthZustand";
@@ -10,17 +10,16 @@ function Navbar() {
     <Grid templateColumns="repeat(10,1fr)" columnGap={"20px"}>
       <GridItem colSpan={8} style={styles.gridItem} boxShadow={"lg"}>
         {isAuthenticate() ? (
-          <>
-            <Link style={styles.link} to={"/searchBook"}>
-              Buscar
-            </Link>
+          <Flex justifyContent={"end"} alignItems={"center"}>
             <Link style={styles.link} to={"/myBooks"}>
               Mis Libros
             </Link>
             <Link style={styles.link} onClick={logout} to={"/"}>
               Logout
             </Link>
-          </>
+
+            <SearchInput />
+          </Flex>
         ) : (
           <>
             <Link style={styles.link} to={"/login"}>
@@ -50,6 +49,8 @@ function Navbar() {
 export default Navbar;
 
 import { CSSProperties } from "react";
+import SearchInput from "./SearchInput";
+import { colors } from "../colors";
 const styles: { [key: string]: CSSProperties } = {
   link: {
     width: "100px",
@@ -58,7 +59,7 @@ const styles: { [key: string]: CSSProperties } = {
   },
   gridItem: {
     display: "flex",
-    background: "#FAF089",
+    background: colors.brand.primary,
     borderRadius: "10px",
     alignItems: "center",
     height: "60px",

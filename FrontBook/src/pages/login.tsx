@@ -5,16 +5,18 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Spinner,
 } from "@chakra-ui/react";
 import React, { forwardRef, useRef, HTMLInputTypeAttribute } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
+import { colors } from "../colors";
 
 function Login() {
   const correoRef = useRef<HTMLInputElement>(null);
   const passRef = useRef<HTMLInputElement>(null);
 
-  const { mutate, error } = useLogin();
+  const { mutate, error, isPending } = useLogin();
   const navigate = useNavigate();
   const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -42,20 +44,37 @@ function Login() {
           placeholder="Ingrese usuario"
           type="text"
           ref={correoRef}
+          isPending={isPending}
         />
         <MyInput
           Label="Contraseña"
           placeholder="Ingrese nombre de usuario"
           type="password"
           ref={passRef}
+          isPending={isPending}
         />
         <Flex gap={"1rem"} mt={"1rem"} justifyContent={"center"}>
-          <Button>
+          <Button
+            isDisabled={isPending ? true : false}
+            variant="link"
+            color={colors.text.primary}
+          >
             <Link to={"/registro"}>Registrarse</Link>
           </Button>
-          <Button type="submit">Conectarse</Button>
+          <Button
+            isDisabled={isPending ? true : false}
+            colorScheme="yellow"
+            type="submit"
+          >
+            Conectarse
+          </Button>
         </Flex>
       </form>
+      <Spinner
+        display={isPending ? "block" : "none"}
+        position={"absolute"}
+        size="xl"
+      />
     </Center>
   );
 }
@@ -66,14 +85,16 @@ type MyInputProps = {
   Label: string;
   placeholder: string;
   type: HTMLInputTypeAttribute;
+  isPending: boolean;
 };
 
 const MyInput = forwardRef<HTMLInputElement, MyInputProps>(
-  ({ Label, placeholder, type }, ref) => {
+  ({ Label, placeholder, type, isPending }, ref) => {
     return (
       <FormControl w={"25rem"}>
         <FormLabel htmlFor={Label}>{Label}</FormLabel>
         <Input
+          isDisabled={isPending ? true : false}
           id={Label}
           type={type}
           placeholder={placeholder}
@@ -87,7 +108,7 @@ const MyInput = forwardRef<HTMLInputElement, MyInputProps>(
 
 const styles = {
   form: {
-    background: "#FAF089",
+    background: colors.brand.primary,
     padding: "3rem",
     borderRadius: "1rem",
     boxShadow:

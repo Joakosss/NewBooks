@@ -118,6 +118,7 @@ def myReadings(request):
     elif (
         request.method == "PATCH"
     ):  # Espera token acces y {myReadingId, myReading:{myReadingData}}
+        print(request.data["myReading"])
         try:
             my_reading = models.MyReading.objects.get(
                 id=request.data["myReadingId"], user=request.user
@@ -136,10 +137,10 @@ def myReadings(request):
         )
         if serializerr.is_valid():
             serializerr.save()
-            print(serializerr)
         else:
+            print(serializerr.errors)
             return Response(
-                {"error": "Error inesperado"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Error inesperado 2"}, status=status.HTTP_400_BAD_REQUEST
             )
         return Response({"message": my_reading.id}, status=status.HTTP_200_OK)
     elif request.method == "DELETE":  # Espera el token acces y {myReadingId}
@@ -161,7 +162,7 @@ def myReadings(request):
             )
         except Exception as e:
             return Response(
-                {"message": "Error inesperado"},
+                {"message": "Error inesperadoaa"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

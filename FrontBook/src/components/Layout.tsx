@@ -5,11 +5,17 @@ type Props = {};
 
 function Layout({}: Props) {
   return (
-    <Grid templateColumns="repeat(12,1fr)" mt={"20px"} gap={"35px"}>
+    <Grid templateColumns="repeat(12,1fr)" mt={"20px"} gap={"1.3rem"}>
       <GridItem colStart={2} colEnd={12}>
         <Navbar />
       </GridItem>
-      <GridItem colStart={2} colEnd={12} display="flex" flexDirection="column">
+      <GridItem
+        colStart={2}
+        colEnd={12}
+        display="flex"
+        flexDirection="column"
+        gap={"1rem"}
+      >
         <Outlet />
       </GridItem>
     </Grid>
