@@ -1,17 +1,20 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./NavBar";
 import { Grid, GridItem } from "@chakra-ui/react";
-type Props = {};
 
-function Layout({}: Props) {
+function Layout() {
   return (
-    <Grid templateColumns="repeat(12,1fr)" mt={"20px"} gap={"1.3rem"}>
-      <GridItem colStart={2} colEnd={12}>
+    <Grid
+      templateColumns="repeat(12,1fr)"
+      mt={{ base: 0, sm: "20px" }}
+      gap={"1.3rem"}
+    >
+      <GridItem colStart={{ base: 1, sm: 2 }} colEnd={{ base: 13, sm: 12 }}>
         <Navbar />
       </GridItem>
       <GridItem
-        colStart={2}
-        colEnd={12}
+        colStart={{ base: 1, sm: 2 }}
+        colEnd={{ base: 13, sm: 12 }}
         display="flex"
         flexDirection="column"
         gap={"1rem"}

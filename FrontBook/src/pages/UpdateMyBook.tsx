@@ -1,13 +1,17 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { MyReading } from "../types/MyReading";
 import { useEffect, useRef } from "react";
-import { Button, Flex, Input, Select, Spinner, Text } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Flex, Grid, GridItem, Image, Spinner, Text } from "@chakra-ui/react";
+import { useMutation } from "@tanstack/react-query";
 import { patchRequestToken, deleteRequestToken } from "../api/apis";
+import { colors } from "../colors";
+import MyButton from "../components/MyButton";
+import { PiStarThin } from "react-icons/pi";
+
+//falta añadir evaluacion, fecha inicio fecha fin,
 
 function UpdateMyBook() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   //useref imputs
   const pagesRef = useRef<HTMLInputElement>(null);
@@ -72,67 +76,135 @@ function UpdateMyBook() {
   };
 
   return (
-    <form onSubmit={handleSend}>
-      <img src={MyReading.book?.imgLink} alt="" />
-      <div>
-        <label htmlFor="pages">Paginas</label>
-        <Input
-          id="pages"
-          type="number"
-          defaultValue={MyReading.book?.pages}
-          ref={pagesRef}
-        />
-      </div>
-      <div>
-        <h2>Titulo</h2>
-        <Text>{MyReading.book?.title}</Text>
-      </div>
-      <div>
-        <h2>Descripción</h2>
-        <Text>{MyReading.book?.description}</Text>
-      </div>
-      <div>
-        <label htmlFor="state">Estado</label>
-        <Select
-          name="state"
-          id="state"
-          ref={stateRef}
-          defaultValue={MyReading.state}
+    <>
+      <Grid
+        templateColumns="repeat(10,1fr)"
+        columnGap={"10px"}
+        bg={"white"}
+        borderRadius={"1rem"}
+        p={{ base: "0 0 1rem 0", sm: "1rem", md: "3rem" }}
+        boxShadow={"lg"}
+      >
+        <GridItem
+          colSpan={{ base: 10, sm: 6, md: 4 }}
+          colStart={{ base: 1, sm: 3, md: 1 }}
+          bg={colors.background.light}
+          h={"100%"}
+          borderRadius={"1rem"}
+          boxShadow={"lg"}
         >
-          <option value="pendiente">Pendiente</option>
-          <option value="leyendo">Leyendo</option>
-          <option value="finalizado">Finalizado</option>
-          <option value="abandonado">Abandonado</option>
-        </Select>
-      </div>
-      <div>
-        <label htmlFor="tipo">Tipo</label>
-        <Select
-          name="tipo"
-          id="tipo"
-          ref={typeRef}
-          defaultValue={MyReading.bookType}
-        >
-          <option value="fisico">Fisico</option>
-          <option value="digital">Digital</option>
-          <option value="audio">Audio</option>
-        </Select>
-      </div>
-      <Flex gap={"3"}>
-        <Button type="button" onClick={() => navigate(-1)}>
-          Atras
-        </Button>
-        <Button type="button" onClick={() => handleDelete()}>
-          Eliminar
-        </Button>
-        <Button type="submit">Modificar</Button>
-      </Flex>
+          <Flex justifyContent={"center"} alignItems={"center"} height={"100%"}>
+            <Image
+              src={MyReading.book?.imgLink}
+              alt=""
+              h={"75%"}
+              boxShadow={"2xl"}
+            />
+          </Flex>
+        </GridItem>
+        <GridItem colSpan={{ base: 10, md: 6 }} px={"2rem"}>
+          <Grid
+            templateColumns="repeat(6,1fr)"
+            columnGap={"10px"}
+            rowGap={"2rem"}
+          >
+            <GridItem colSpan={6}>
+              <Text fontSize={"3xl"} fontWeight={"semibold"}>
+                {MyReading.book?.title}
+              </Text>
+              <Text fontSize={"2xl"} fontWeight={"light"}>
+                {MyReading.book?.author}
+              </Text>
+            </GridItem>
+            <GridItem colSpan={{ base: 6, md: 3 }}>
+              <Text fontSize={"lg"} fontWeight={"light"}>
+                Evaluación
+              </Text>
+              <Flex gap="0.5rem">
+                <PiStarThin size={"1.5rem"}></PiStarThin>
+                <PiStarThin size={"1.5rem"}></PiStarThin>
+                <PiStarThin size={"1.5rem"}></PiStarThin>
+                <PiStarThin size={"1.5rem"}></PiStarThin>
+                <PiStarThin size={"1.5rem"}></PiStarThin>
+              </Flex>
+            </GridItem>
+            <GridItem colSpan={{ base: 3, sm: 3, md: 3 }}>
+              <Flex flexDir={"column"}>
+                <Text fontSize={"lg"} fontWeight={"light"}>
+                  Tipo
+                </Text>
+                <Text fontSize={"lg"} fontWeight={"normal"}>
+                  {MyReading.bookType}
+                </Text>
+              </Flex>
+            </GridItem>
+            <GridItem colSpan={{ base: 3, sm: 3, md: 2 }}>
+              <Flex flexDir={"column"}>
+                <Text fontSize={"lg"} fontWeight={"light"}>
+                  Género
+                </Text>
+                <Text fontSize={"lg"} fontWeight={"normal"}>
+                  {MyReading.book?.category}
+                </Text>
+              </Flex>
+            </GridItem>
+            <GridItem colSpan={{ base: 3, sm: 3, md: 2 }}>
+              <Flex flexDir={"column"}>
+                <Text fontSize={"lg"} fontWeight={"light"}>
+                  páginas
+                </Text>
+                <Text fontSize={"lg"} fontWeight={"normal"}>
+                  {MyReading.currentPage}
+                </Text>
+              </Flex>
+            </GridItem>
+            <GridItem colSpan={{ base: 3, sm: 2, md: 2 }}>
+              <Flex flexDir={"column"}>
+                <Text fontSize={"lg"} fontWeight={"light"}>
+                  Publicación
+                </Text>
+                <Text fontSize={"lg"} fontWeight={"normal"}>
+                  S/F
+                </Text>
+              </Flex>
+            </GridItem>
+            <GridItem colSpan={2}>
+              <MyButton color="tertiary" onClick={() => navigate(-1)}>
+                Atrás
+              </MyButton>
+            </GridItem>
+            <GridItem colSpan={2}>
+              <MyButton color="secondary" onClick={() => handleDelete()}>
+                Eliminar
+              </MyButton>
+            </GridItem>
+            <GridItem colSpan={2}>
+              <MyButton color="primary" onClick={() => {}}>
+                Modificar
+              </MyButton>
+            </GridItem>
+          </Grid>
+        </GridItem>
+      </Grid>
+      <Grid
+        templateColumns="repeat(10,1fr)"
+        columnGap={"10px"}
+        bg={"white"}
+        borderRadius={"1rem"}
+        p={"3rem"}
+        boxShadow={"lg"}
+      >
+        <GridItem>
+          <Text>Comentarios</Text>
+        </GridItem>
+      </Grid>
       <Spinner
+        display={"none"}
         /* display={isPending ? "block" : "none"} */
         position={"absolute"}
         size="xl"
       />
-    </form>
+    </>
   );
 }
 
