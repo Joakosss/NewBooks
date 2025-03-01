@@ -1,12 +1,23 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { MyReading } from "../types/MyReading";
-import { useEffect, useRef } from "react";
-import { Flex, Grid, GridItem, Image, Spinner, Text } from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Flex,
+  Grid,
+  GridItem,
+  Image,
+  Input,
+  Spinner,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { patchRequestToken, deleteRequestToken } from "../api/apis";
 import { colors } from "../colors";
 import MyButton from "../components/MyButton";
-import { PiStarThin } from "react-icons/pi";
+import React from "react";
+import MyAlertDialog from "../components/AlertDialog";
+import MyCalification from "../components/MyCalification";
 
 //falta añadir evaluacion, fecha inicio fecha fin,
 
@@ -20,7 +31,10 @@ function UpdateMyBook() {
 
   const location = useLocation();
   const MyReading: MyReading = location.state;
-  const { book, ...MyReadingWithoutBook } = MyReading;
+  const MyReadingWithoutBook = MyReading;
+
+  //modificando
+  const [modificationState, setModificationState] = useState<boolean>(false);
 
   //mutate modificacion de libro
   const {
@@ -52,7 +66,7 @@ function UpdateMyBook() {
   //funcion de enviar
   const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    alert("hola");
     MyReadingWithoutBook["currentPage"] = pagesRef.current
       ? Number(pagesRef.current.value)
       : 0;
@@ -69,6 +83,11 @@ function UpdateMyBook() {
     mutatePatch(MyReadingWithoutBook);
     navigate("/myBooks");
   };
+
+  //eliminar libro
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement | null>(null);
 
   const handleDelete = () => {
     mutateDelete();
@@ -121,11 +140,10 @@ function UpdateMyBook() {
                 Evaluación
               </Text>
               <Flex gap="0.5rem">
-                <PiStarThin size={"1.5rem"}></PiStarThin>
-                <PiStarThin size={"1.5rem"}></PiStarThin>
-                <PiStarThin size={"1.5rem"}></PiStarThin>
-                <PiStarThin size={"1.5rem"}></PiStarThin>
-                <PiStarThin size={"1.5rem"}></PiStarThin>
+                <MyCalification
+                  idMyReading={MyReading.id!}
+                  calification={MyReading.calification}
+                />
               </Flex>
             </GridItem>
             <GridItem colSpan={{ base: 3, sm: 3, md: 3 }}>
@@ -133,9 +151,17 @@ function UpdateMyBook() {
                 <Text fontSize={"lg"} fontWeight={"light"}>
                   Tipo
                 </Text>
-                <Text fontSize={"lg"} fontWeight={"normal"}>
+                <Text
+                  display={!modificationState ? "block" : "none"}
+                  fontSize={"lg"}
+                  fontWeight={"normal"}
+                >
                   {MyReading.bookType}
                 </Text>
+                <Input
+                  display={modificationState ? "block" : "none"}
+                  value={MyReading.bookType}
+                ></Input>
               </Flex>
             </GridItem>
             <GridItem colSpan={{ base: 3, sm: 3, md: 2 }}>
@@ -153,9 +179,17 @@ function UpdateMyBook() {
                 <Text fontSize={"lg"} fontWeight={"light"}>
                   páginas
                 </Text>
-                <Text fontSize={"lg"} fontWeight={"normal"}>
+                <Text
+                  display={!modificationState ? "block" : "none"}
+                  fontSize={"lg"}
+                  fontWeight={"normal"}
+                >
                   {MyReading.currentPage}
                 </Text>
+                <Input
+                  display={modificationState ? "block" : "none"}
+                  value={MyReading.currentPage}
+                ></Input>
               </Flex>
             </GridItem>
             <GridItem colSpan={{ base: 3, sm: 2, md: 2 }}>
@@ -174,13 +208,26 @@ function UpdateMyBook() {
               </MyButton>
             </GridItem>
             <GridItem colSpan={2}>
-              <MyButton color="secondary" onClick={() => handleDelete()}>
+              <MyButton color="secondary" onClick={onOpen}>
                 Eliminar
               </MyButton>
             </GridItem>
             <GridItem colSpan={2}>
-              <MyButton color="primary" onClick={() => {}}>
+              <MyButton
+                display={!modificationState ? "block" : "none"}
+                color="primary"
+                type="button"
+                onClick={() => setModificationState(!modificationState)}
+              >
                 Modificar
+              </MyButton>
+              <MyButton
+                display={modificationState ? "block" : "none"}
+                color="primary"
+                type="button"
+                onClick={() => handleSend}
+              >
+                Confirmar
               </MyButton>
             </GridItem>
           </Grid>
@@ -204,6 +251,16 @@ function UpdateMyBook() {
         position={"absolute"}
         size="xl"
       />
+      <MyAlertDialog
+        handleActive={handleDelete}
+        title="¿Estas seguro?"
+        type="negative"
+        isOpen={isOpen}
+        onClose={onClose}
+        cancelRef={cancelRef}
+      >
+        Estas eliminando este libro "{MyReading.book?.title}"
+      </MyAlertDialog>
     </>
   );
 }

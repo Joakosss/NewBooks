@@ -7,9 +7,16 @@ type MyButtonProp = {
   onClick?: () => void;
   type?: "button" | "submit";
   color: "primary" | "secondary" | "tertiary";
+  display?: "block" | "none";
 };
 
-function MyButton({ children, onClick, type = "button", color }: MyButtonProp) {
+function MyButton({
+  children,
+  onClick,
+  type = "button",
+  color,
+  display = "block",
+}: MyButtonProp) {
   const displayColors = {
     primary: {
       bg: colors.brand.primary,
@@ -26,6 +33,7 @@ function MyButton({ children, onClick, type = "button", color }: MyButtonProp) {
 
   return (
     <Button
+      display={display}
       w={"100%"}
       color={colors.text.secondary}
       {...displayColors[color]}
