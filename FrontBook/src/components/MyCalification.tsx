@@ -4,14 +4,14 @@ import { colors } from "../colors";
 
 type MyCalificationProp = {
   localCalification: 1 | 2 | 3 | 4 | 5 | null;
-  setLocalCalification: (value: 1 | 2 | 3 | 4 | 5 | null) => void;
-  modificationState: boolean;
+  setLocalCalification?: (value: 1 | 2 | 3 | 4 | 5 | null) => void;
+  modificationState?: boolean;
 };
 
 function MyCalification({
   localCalification,
-  setLocalCalification,
-  modificationState,
+  setLocalCalification = () => {},
+  modificationState = false,
 }: MyCalificationProp) {
   const totalStars = 5;
 

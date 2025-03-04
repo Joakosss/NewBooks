@@ -1,10 +1,21 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Book from "../types/Book";
-import { Button, Flex, Input, Select, Spinner, Text } from "@chakra-ui/react";
+import {
+  Image,
+  Flex,
+  Grid,
+  GridItem,
+  Input,
+  Select,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import { useRef } from "react";
 import { MyReading } from "../types/MyReading";
 import { useMutation } from "@tanstack/react-query";
 import { postRequest } from "../api/apis";
+import { colors } from "../colors";
+import MyButton from "../components/MyButton";
 
 function AddBook() {
   const location = useLocation();
@@ -60,59 +71,135 @@ function AddBook() {
     );
   };
   return (
-    <form onSubmit={handleSend} method="Post">
-      <img src={book.imgLink} alt="" />
-      <div>
-        <label htmlFor="pages">Paginas</label>
-        <Input
-          id="pages"
-          type="number"
-          defaultValue={book.pages}
-          ref={myPagesRef}
-        />
-      </div>
-      <div>
-        <h2>Titulo</h2>
-        <Text>{book.title}</Text>
-      </div>
-      <div>
-        <h2>Descripción</h2>
-        <Text>{book.description}</Text>
-      </div>
-      <div>
-        <label htmlFor="state">Estado</label>
-        <Select
-          name="state"
-          id="state"
-          ref={stateRef}
-          defaultValue={"Pendiente"}
+    <>
+      <Grid
+        templateColumns="repeat(10,1fr)"
+        columnGap={"10px"}
+        rowGap={"1rem"}
+        bg={"white"}
+        borderRadius={"1rem"}
+        p={{ base: "0 0 1rem 0", sm: "1rem", md: "3rem" }}
+        boxShadow={"lg"}
+      >
+        <GridItem
+          colSpan={{ base: 10, sm: 6, md: 4 }}
+          colStart={{ base: 1, sm: 3, md: 1 }}
+          bg={colors.background.light}
+          h={"100%"}
+          borderRadius={"1rem"}
+          boxShadow={"lg"}
         >
-          <option value="pendiente">Pendiente</option>
-          <option value="leyendo">Leyendo</option>
-          <option value="finalizado">Finalizado</option>
-          <option value="abandonado">Abandonado</option>
-        </Select>
-      </div>
-      <div>
-        <label htmlFor="tipo">Tipo</label>
-        <Select name="tipo" id="tipo" ref={bookTypeRef} defaultValue={"fisico"}>
-          <option value="fisico">Fisico</option>
-          <option value="digital">Digital</option>
-          <option value="audio">Audio</option>
-        </Select>
-      </div>
-      <Flex gap={"3"}>
-        <Button type="button" onClick={() => navigate(-1)}>
-          Atras
-        </Button>
-        <Button type="submit">Guardar</Button>
-      </Flex>
-      <Spinner
-        display={isPending ? "block" : "none"}
+          <Flex justifyContent={"center"} alignItems={"center"} height={"100%"}>
+            <Image src={book.imgLink} alt="" h={"75%"} boxShadow={"2xl"} />
+          </Flex>
+        </GridItem>
+        <GridItem colSpan={{ base: 10, md: 6 }} px={"2rem"}>
+          <form onSubmit={handleSend}>
+            <Grid
+              templateColumns="repeat(6,1fr)"
+              columnGap={"10px"}
+              rowGap={"1rem"}
+            >
+              <Flex
+                bg={colors.brand.primary_active}
+                borderRadius={"2xl"}
+                justifyContent={"center"}
+                color={colors.brand.primary_hover}
+              >
+                {book.category}
+              </Flex>
+              <GridItem colSpan={6}>
+                <Text fontSize={"3xl"} fontWeight={"semibold"}>
+                  {book.title}
+                </Text>
+                <Text fontSize={"2xl"} fontWeight={"light"}>
+                  {book.author}
+                </Text>
+              </GridItem>
+              <GridItem colSpan={{ base: 3, sm: 3, md: 3 }}>
+                <Flex flexDir={"column"}>
+                  <Text fontSize={"lg"} fontWeight={"light"}>
+                    Tipo
+                  </Text>
+                  <Select defaultValue={"fisico"} ref={bookTypeRef}>
+                    <option value="fisico">Fisico</option>
+                    <option value="digital">Digital</option>
+                    <option value="audio">Audio</option>
+                  </Select>
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={{ base: 3, sm: 3, md: 3 }}>
+                <Flex flexDir={"column"}>
+                  <Text fontSize={"lg"} fontWeight={"light"}>
+                    Estado
+                  </Text>
+                  <Select defaultValue={"pendiente"} ref={stateRef}>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="leyendo">Leyendo</option>
+                    <option value="finalizado">Finalizado</option>
+                    <option value="abandonado">Abandonado</option>
+                  </Select>
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={{ base: 3, sm: 3, md: 3 }}>
+                <Flex flexDir={"column"}>
+                  <Text fontSize={"lg"} fontWeight={"light"}>
+                    páginas
+                  </Text>
+                  <Input
+                    defaultValue={"1"}
+                    ref={myPagesRef}
+                    type="number"
+                  ></Input>
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={2} colStart={1}>
+                <MyButton color="tertiary" onClick={() => navigate(-1)}>
+                  Atrás
+                </MyButton>
+              </GridItem>
+              {/* <GridItem colSpan={2}>
+                <MyButton color="secondary" onClick={onOpen}>
+                  Eliminar
+                </MyButton>
+              </GridItem> */}
+              <GridItem colSpan={2}>
+                <MyButton color="primary" type="submit">
+                  Guardar
+                </MyButton>
+              </GridItem>
+            </Grid>
+          </form>
+        </GridItem>
+      </Grid>
+      <Grid
+        templateColumns="repeat(10,1fr)"
+        columnGap={"10px"}
+        bg={"white"}
+        borderRadius={"1rem"}
+        p={"3rem"}
+        boxShadow={"lg"}
+      >
+        <GridItem>
+          <Text>Comentarios</Text>
+        </GridItem>
+      </Grid>
+      {/* <Spinner
+        display={pendingPatch ? "block" : "none"}
         position={"absolute"}
         size="xl"
       />
-    </form>
+      <MyAlertDialog
+        handleActive={handleDelete}
+        title="¿Estas seguro?"
+        type="negative"
+        isOpen={isOpen}
+        onClose={onClose}
+        cancelRef={cancelRef}
+      >
+        Estas eliminando este libro "{MyReading.book?.title}"
+      </MyAlertDialog> */}
+    </>
   );
 }
 
