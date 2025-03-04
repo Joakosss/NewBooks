@@ -7,6 +7,7 @@ import {
   GridItem,
   Image,
   Input,
+  Select,
   Spinner,
   Text,
   useDisclosure,
@@ -23,17 +24,19 @@ import MyCalification from "../components/MyCalification";
 
 function UpdateMyBook() {
   const navigate = useNavigate();
+  //accedo a los datos de myreading
+  const location = useLocation();
+  const MyReading: MyReading = location.state;
 
   //useref imputs
   const pagesRef = useRef<HTMLInputElement>(null);
   const stateRef = useRef<HTMLSelectElement>(null);
   const typeRef = useRef<HTMLSelectElement>(null);
+  const [localCalification, setLocalCalification] = useState(
+    MyReading.calification
+  );
 
-  const location = useLocation();
-  const MyReading: MyReading = location.state;
-  const MyReadingWithoutBook = MyReading;
-
-  //modificando
+  //switch de modificación
   const [modificationState, setModificationState] = useState<boolean>(false);
 
   //mutate modificacion de libro
@@ -57,7 +60,6 @@ function UpdateMyBook() {
 
   //redirecciona en caso de no tener un libro vinculado a la pagina de mis libros
   useEffect(() => {
-    console.log(MyReading);
     if (!MyReading) {
       navigate("/myBooks");
     }
@@ -66,29 +68,20 @@ function UpdateMyBook() {
   //funcion de enviar
   const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert("hola");
-    MyReadingWithoutBook["currentPage"] = pagesRef.current
-      ? Number(pagesRef.current.value)
-      : 0;
-    MyReadingWithoutBook["state"] = stateRef.current
-      ? (stateRef.current.value as
-          | "pendiente"
-          | "leyendo"
-          | "finalizado"
-          | "abandonado")
-      : "pendiente";
-    MyReadingWithoutBook["bookType"] = typeRef.current
-      ? (typeRef.current.value as "fisico" | "digital" | "audio")
-      : "fisico";
-    mutatePatch(MyReadingWithoutBook);
+    const myUpdateObject = {
+      currentPage: pagesRef.current?.value,
+      state: stateRef.current?.value,
+      bookType: typeRef.current?.value,
+      calification: localCalification,
+    };
+    mutatePatch(myUpdateObject);
     navigate("/myBooks");
   };
 
-  //eliminar libro
-
+  //Alert confirmar delete
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
-
+  //function delete myreading
   const handleDelete = () => {
     mutateDelete();
     navigate("/myBooks");
@@ -99,6 +92,7 @@ function UpdateMyBook() {
       <Grid
         templateColumns="repeat(10,1fr)"
         columnGap={"10px"}
+        rowGap={"1rem"}
         bg={"white"}
         borderRadius={"1rem"}
         p={{ base: "0 0 1rem 0", sm: "1rem", md: "3rem" }}
@@ -122,115 +116,146 @@ function UpdateMyBook() {
           </Flex>
         </GridItem>
         <GridItem colSpan={{ base: 10, md: 6 }} px={"2rem"}>
-          <Grid
-            templateColumns="repeat(6,1fr)"
-            columnGap={"10px"}
-            rowGap={"2rem"}
-          >
-            <GridItem colSpan={6}>
-              <Text fontSize={"3xl"} fontWeight={"semibold"}>
-                {MyReading.book?.title}
-              </Text>
-              <Text fontSize={"2xl"} fontWeight={"light"}>
-                {MyReading.book?.author}
-              </Text>
-            </GridItem>
-            <GridItem colSpan={{ base: 6, md: 3 }}>
-              <Text fontSize={"lg"} fontWeight={"light"}>
-                Evaluación
-              </Text>
-              <Flex gap="0.5rem">
-                <MyCalification
-                  idMyReading={MyReading.id!}
-                  calification={MyReading.calification}
-                />
-              </Flex>
-            </GridItem>
-            <GridItem colSpan={{ base: 3, sm: 3, md: 3 }}>
-              <Flex flexDir={"column"}>
-                <Text fontSize={"lg"} fontWeight={"light"}>
-                  Tipo
-                </Text>
-                <Text
-                  display={!modificationState ? "block" : "none"}
-                  fontSize={"lg"}
-                  fontWeight={"normal"}
-                >
-                  {MyReading.bookType}
-                </Text>
-                <Input
-                  display={modificationState ? "block" : "none"}
-                  value={MyReading.bookType}
-                ></Input>
-              </Flex>
-            </GridItem>
-            <GridItem colSpan={{ base: 3, sm: 3, md: 2 }}>
-              <Flex flexDir={"column"}>
-                <Text fontSize={"lg"} fontWeight={"light"}>
-                  Género
-                </Text>
-                <Text fontSize={"lg"} fontWeight={"normal"}>
-                  {MyReading.book?.category}
-                </Text>
-              </Flex>
-            </GridItem>
-            <GridItem colSpan={{ base: 3, sm: 3, md: 2 }}>
-              <Flex flexDir={"column"}>
-                <Text fontSize={"lg"} fontWeight={"light"}>
-                  páginas
-                </Text>
-                <Text
-                  display={!modificationState ? "block" : "none"}
-                  fontSize={"lg"}
-                  fontWeight={"normal"}
-                >
-                  {MyReading.currentPage}
-                </Text>
-                <Input
-                  display={modificationState ? "block" : "none"}
-                  value={MyReading.currentPage}
-                ></Input>
-              </Flex>
-            </GridItem>
-            <GridItem colSpan={{ base: 3, sm: 2, md: 2 }}>
-              <Flex flexDir={"column"}>
-                <Text fontSize={"lg"} fontWeight={"light"}>
-                  Publicación
-                </Text>
-                <Text fontSize={"lg"} fontWeight={"normal"}>
-                  S/F
-                </Text>
-              </Flex>
-            </GridItem>
-            <GridItem colSpan={2}>
-              <MyButton color="tertiary" onClick={() => navigate(-1)}>
-                Atrás
-              </MyButton>
-            </GridItem>
-            <GridItem colSpan={2}>
-              <MyButton color="secondary" onClick={onOpen}>
-                Eliminar
-              </MyButton>
-            </GridItem>
-            <GridItem colSpan={2}>
-              <MyButton
-                display={!modificationState ? "block" : "none"}
-                color="primary"
-                type="button"
-                onClick={() => setModificationState(!modificationState)}
+          <form onSubmit={handleSend}>
+            <Grid
+              templateColumns="repeat(6,1fr)"
+              columnGap={"10px"}
+              rowGap={"1rem"}
+            >
+              <Flex
+                bg={colors.brand.primary_active}
+                borderRadius={"2xl"}
+                justifyContent={"center"}
+                color={colors.brand.primary_hover}
               >
-                Modificar
-              </MyButton>
-              <MyButton
-                display={modificationState ? "block" : "none"}
-                color="primary"
-                type="button"
-                onClick={() => handleSend}
-              >
-                Confirmar
-              </MyButton>
-            </GridItem>
-          </Grid>
+                {MyReading.book?.category}
+              </Flex>
+              <GridItem colSpan={6}>
+                <Text fontSize={"3xl"} fontWeight={"semibold"}>
+                  {MyReading.book?.title}
+                </Text>
+                <Text fontSize={"2xl"} fontWeight={"light"}>
+                  {MyReading.book?.author}
+                </Text>
+              </GridItem>
+              <GridItem colSpan={{ base: 6, md: 3 }}>
+                <Text fontSize={"lg"} fontWeight={"light"}>
+                  Evaluación
+                </Text>
+                <Flex gap="0.5rem">
+                  <MyCalification
+                    modificationState={modificationState}
+                    localCalification={localCalification}
+                    setLocalCalification={setLocalCalification}
+                  />
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={{ base: 3, sm: 3, md: 3 }}>
+                <Flex flexDir={"column"}>
+                  <Text fontSize={"lg"} fontWeight={"light"}>
+                    Tipo
+                  </Text>
+                  <Text
+                    display={!modificationState ? "block" : "none"}
+                    fontSize={"lg"}
+                    fontWeight={"normal"}
+                  >
+                    {MyReading.bookType}
+                  </Text>
+                  <Select
+                    display={modificationState ? "block" : "none"}
+                    defaultValue={MyReading.bookType}
+                    ref={typeRef}
+                  >
+                    <option value="fisico">Fisico</option>
+                    <option value="digital">Digital</option>
+                    <option value="audio">Audio</option>
+                  </Select>
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={{ base: 3, sm: 3, md: 2 }}>
+                <Flex flexDir={"column"}>
+                  <Text fontSize={"lg"} fontWeight={"light"}>
+                    Tipo
+                  </Text>
+                  <Text
+                    display={!modificationState ? "block" : "none"}
+                    fontSize={"lg"}
+                    fontWeight={"normal"}
+                  >
+                    {MyReading.state}
+                  </Text>
+                  <Select
+                    display={modificationState ? "block" : "none"}
+                    defaultValue={MyReading.state}
+                    ref={stateRef}
+                  >
+                    <option value="pendiente">Pendiente</option>
+                    <option value="leyendo">Leyendo</option>
+                    <option value="finalizado">Finalizado</option>
+                    <option value="abandonado">Abandonado</option>
+                  </Select>
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={{ base: 3, sm: 3, md: 2 }}>
+                <Flex flexDir={"column"}>
+                  <Text fontSize={"lg"} fontWeight={"light"}>
+                    páginas
+                  </Text>
+                  <Text
+                    display={!modificationState ? "block" : "none"}
+                    fontSize={"lg"}
+                    fontWeight={"normal"}
+                  >
+                    {MyReading.currentPage}
+                  </Text>
+                  <Input
+                    display={modificationState ? "block" : "none"}
+                    defaultValue={MyReading.currentPage}
+                    ref={pagesRef}
+                    type="number"
+                  ></Input>
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={{ base: 3, sm: 2, md: 2 }}>
+                <Flex flexDir={"column"}>
+                  <Text fontSize={"lg"} fontWeight={"light"}>
+                    Publicación
+                  </Text>
+                  <Text fontSize={"lg"} fontWeight={"normal"}>
+                    S/F
+                  </Text>
+                </Flex>
+              </GridItem>
+              <GridItem colSpan={2}>
+                <MyButton color="tertiary" onClick={() => navigate(-1)}>
+                  Atrás
+                </MyButton>
+              </GridItem>
+              <GridItem colSpan={2}>
+                <MyButton color="secondary" onClick={onOpen}>
+                  Eliminar
+                </MyButton>
+              </GridItem>
+              <GridItem colSpan={2}>
+                <MyButton
+                  display={!modificationState ? "block" : "none"}
+                  color="primary"
+                  type="button"
+                  onClick={() => setModificationState(!modificationState)}
+                >
+                  Modificar
+                </MyButton>
+                <MyButton
+                  display={modificationState ? "block" : "none"}
+                  color="primary"
+                  type="submit"
+                >
+                  Confirmar
+                </MyButton>
+              </GridItem>
+            </Grid>
+          </form>
         </GridItem>
       </Grid>
       <Grid
@@ -246,8 +271,7 @@ function UpdateMyBook() {
         </GridItem>
       </Grid>
       <Spinner
-        display={"none"}
-        /* display={isPending ? "block" : "none"} */
+        display={pendingPatch ? "block" : "none"}
         position={"absolute"}
         size="xl"
       />

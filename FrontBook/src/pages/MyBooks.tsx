@@ -28,16 +28,16 @@ export default function GetMyBooks() {
         Mis Libros
       </Text>
       <Flex gap={"1rem"}>
-        <Select w={"10rem"}>
-          <option disabled selected>
+        <Select w={"10rem"} defaultValue={0}>
+          <option value={0} disabled>
             Filtrar Tipo
           </option>
           <option value="Pendiente">Fisico</option>
           <option value="Leyendo">Digital</option>
           <option value="Finalizado">Audio</option>
         </Select>
-        <Select w={"10rem"}>
-          <option disabled selected>
+        <Select w={"10rem"} defaultValue={0}>
+          <option value={0} disabled>
             Filtrar Estado
           </option>
           <option value="Pendiente">Pendiente</option>

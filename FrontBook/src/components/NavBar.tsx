@@ -77,11 +77,12 @@ function Navbar() {
             boxSize={{ base: "30px", md: "23px" }}
             cursor="pointer"
             role="button"
-            as={RxHamburgerMenu}
-            aria-label="ir al inicio"
+            aria-label="Abrir menú"
             onClick={onOpen}
             ref={btnRef}
-          />
+          >
+            <RxHamburgerMenu style={{ width: "100%", height: "100%" }} />{" "}
+          </Box>
         </NavbarPart>
       </Grid>
       <Drawer
