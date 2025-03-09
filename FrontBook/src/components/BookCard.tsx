@@ -1,5 +1,6 @@
 import { Card, Heading, Image, Skeleton } from "@chakra-ui/react";
 import Book from "../types/Book";
+import { useState } from "react";
 
 type BookCardProps = {
   book: Book;
@@ -7,9 +8,11 @@ type BookCardProps = {
 };
 
 function BookCard({ book, handleNavigate }: BookCardProps) {
+  const [imageIsLoaded, setImageIsLoaded] = useState<boolean>(false);
+
   return (
     <Card
-      maxW={"200px"}
+      maxW={"300px"}
       _hover={{ transform: "scale(1.03)", transition: "transform 0.3s" }}
       w={"100"}
       onClick={() => handleNavigate(book)}
@@ -17,14 +20,24 @@ function BookCard({ book, handleNavigate }: BookCardProps) {
       boxShadow={"lg"}
     >
       {book.imgLink ? (
-        <Image
-          w={"100%"}
-          src={book.imgLink}
-          alt={`Portada de ${book.title}`}
-          borderTopRadius="lg"
-          aspectRatio="2/3" // Relación de aspecto (ancho/alto) de 2:3
-          objectFit="cover"
-        />
+        <>
+          <Image
+            loading="lazy"
+            w={"100%"}
+            src={book.imgLink}
+            alt={`Portada de ${book.title}`}
+            borderTopRadius="lg"
+            aspectRatio="2/3" // Relación de aspecto (ancho/alto) de 2:3
+            objectFit="cover"
+            onLoad={() => setImageIsLoaded(true)}
+            display={imageIsLoaded ? "block" : "none"}
+          />
+          <Skeleton
+            w={"100%"}
+            aspectRatio="2/3"
+            display={!imageIsLoaded ? "block" : "none"}
+          />
+        </>
       ) : (
         <Skeleton height="100%" borderTopRadius="lg" />
       )}

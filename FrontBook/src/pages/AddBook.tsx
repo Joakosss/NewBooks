@@ -7,7 +7,6 @@ import {
   GridItem,
   Input,
   Select,
-  Spinner,
   Text,
 } from "@chakra-ui/react";
 import { useRef } from "react";
@@ -37,7 +36,7 @@ function AddBook() {
   });
 
   /* const { mutate } = useSaveMyBook(); */
-  const handleSend = (e) => {
+  const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const myReading: MyReading = {
       state:
@@ -76,7 +75,7 @@ function AddBook() {
         templateColumns="repeat(10,1fr)"
         columnGap={"10px"}
         rowGap={"1rem"}
-        bg={"white"}
+        bg={"whiteAlpha.100"}
         borderRadius={"1rem"}
         p={{ base: "0 0 1rem 0", sm: "1rem", md: "3rem" }}
         boxShadow={"lg"}
@@ -84,7 +83,7 @@ function AddBook() {
         <GridItem
           colSpan={{ base: 10, sm: 6, md: 4 }}
           colStart={{ base: 1, sm: 3, md: 1 }}
-          bg={colors.background.light}
+          bg={colors.background.dark}
           h={"100%"}
           borderRadius={"1rem"}
           boxShadow={"lg"}
@@ -100,14 +99,19 @@ function AddBook() {
               columnGap={"10px"}
               rowGap={"1rem"}
             >
-              <Flex
-                bg={colors.brand.primary_active}
-                borderRadius={"2xl"}
-                justifyContent={"center"}
-                color={colors.brand.primary_hover}
-              >
-                {book.category}
-              </Flex>
+              <GridItem colSpan={6}>
+                <Flex
+                  bg={colors.brand.primary_active}
+                  borderRadius={"2xl"}
+                  justifyContent={"center"}
+                  color={colors.brand.primary_hover}
+                  fontSize={"md"}
+                  px={"1rem"}
+                  w={"fit-content"}
+                >
+                  {book.category}
+                </Flex>
+              </GridItem>
               <GridItem colSpan={6}>
                 <Text fontSize={"3xl"} fontWeight={"semibold"}>
                   {book.title}
@@ -121,7 +125,11 @@ function AddBook() {
                   <Text fontSize={"lg"} fontWeight={"light"}>
                     Tipo
                   </Text>
-                  <Select defaultValue={"fisico"} ref={bookTypeRef}>
+                  <Select
+                    defaultValue={"fisico"}
+                    ref={bookTypeRef}
+                    bg={"white"}
+                  >
                     <option value="fisico">Fisico</option>
                     <option value="digital">Digital</option>
                     <option value="audio">Audio</option>
@@ -133,7 +141,11 @@ function AddBook() {
                   <Text fontSize={"lg"} fontWeight={"light"}>
                     Estado
                   </Text>
-                  <Select defaultValue={"pendiente"} ref={stateRef}>
+                  <Select
+                    defaultValue={"pendiente"}
+                    ref={stateRef}
+                    bg={"white"}
+                  >
                     <option value="pendiente">Pendiente</option>
                     <option value="leyendo">Leyendo</option>
                     <option value="finalizado">Finalizado</option>
@@ -144,10 +156,11 @@ function AddBook() {
               <GridItem colSpan={{ base: 3, sm: 3, md: 3 }}>
                 <Flex flexDir={"column"}>
                   <Text fontSize={"lg"} fontWeight={"light"}>
-                    páginas
+                    Páginas
                   </Text>
                   <Input
-                    defaultValue={"1"}
+                    bg={"white"}
+                    defaultValue={book.pages}
                     ref={myPagesRef}
                     type="number"
                   ></Input>
@@ -158,11 +171,6 @@ function AddBook() {
                   Atrás
                 </MyButton>
               </GridItem>
-              {/* <GridItem colSpan={2}>
-                <MyButton color="secondary" onClick={onOpen}>
-                  Eliminar
-                </MyButton>
-              </GridItem> */}
               <GridItem colSpan={2}>
                 <MyButton color="primary" type="submit">
                   Guardar
